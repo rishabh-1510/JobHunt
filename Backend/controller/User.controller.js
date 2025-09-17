@@ -1,0 +1,107 @@
+import {User} from "../models/user.model.js";
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+dotenv.config()
+export const register =async(req,res)=>{
+    try{
+        const{fullName , email , phoneNumber ,password,role} = req.body; 
+        if(!fullName || !email || !phoneNumber || !password || !role){
+            return res.status(400).json({
+                success:false,
+                message:"Fill all the credential properly"
+            })
+        };
+        const user = User.findOne(email);
+        if(!user){
+            return res.status(401).json({
+                success:false,
+                message:"User Already exists please login"
+            })
+        }
+        const hashedPassword =await bcrypt.hash(password,10);
+        
+        const response = User.create({fullName,email,phoneNumber,password:hashedPassword,role});
+        
+        return res.status(200).json({
+            success:true,
+            message:"User Created Successfully"
+        })
+
+    }catch(err){
+        return res.status(404).json({
+            success:false,
+            message:err.message
+    })
+}}
+
+export const login = async(req,res)=>{
+    try{
+        const{email , password , role} = req.body;
+        if(!email || !password || !role){
+            return res.status(404).json({
+                success:false,
+                message:"Fill all fields carefully"
+            })
+        }
+
+        let user = User.findOne({email:email});
+        if(!user){
+            return res.status(400).json({
+                success:false,
+                message:"User doesnot exist"
+            })
+        }
+        const isPassword = bcrypt.compare(password,user.password);
+        if(!isPassword){
+            return res.status(401).json({
+                success:false,
+                message:"Incorrect Password"
+            }) 
+        }
+        if(role != user.role){
+            return res.status(401).json({
+                success:false,
+                message:"Incorrect Role"
+            })
+        }
+        const tokenData  = {
+            userId:user._id
+        }
+        const token = jwt.sign(tokenData,process.env.SECRET_KEY,{expiresIn:'1d'});
+
+        user={
+            _id:user._id,
+            fullName:user.fullName,
+            email:user.email,
+            phoneNumber:user.phoneNumber,
+            role:user.role,
+            profile:user.profile
+        }
+        
+        return res.status(200).cookie("token",token,{maxAge:1*24*60*60*1000 , httpOnly:true , sameSite:'Strict'}).json({
+            success:true,
+            message:`Welcome back ${user.fullName}`,
+            user
+        })
+
+
+    }catch(err){
+        return res.status(404).json({
+            success:false,
+            message:err.message
+    })
+    }
+}
+
+export const logout = async(req,res)=>{
+    try{
+        return res.status(200).cookie("token","",{maxAge:0}).json({
+            success:true,
+            message:"Logged Out Successful"
+        })
+
+    }catch(err){
+        console.log(err);
+    }
+}
