@@ -1,12 +1,12 @@
-import {User} from "../models/user.model.js";
+import User from "../models/user.model.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 dotenv.config()
 export const register =async(req,res)=>{
     try{
-        const{fullName , email , phoneNumber ,password,role} = req.body; 
-        if(!fullName || !email || !phoneNumber || !password || !role){
+        const{fullName , email , mobileNumber ,password,role} = req.body; 
+        if(!fullName || !email || !mobileNumber || !password || !role){
             return res.status(400).json({
                 success:false,
                 message:"Fill all the credential properly"
@@ -21,7 +21,7 @@ export const register =async(req,res)=>{
         }
         const hashedPassword =await bcrypt.hash(password,10);
         
-        const response = User.create({fullName,email,phoneNumber,password:hashedPassword,role});
+        const response = User.create({fullName,email,mobileNumber,password:hashedPassword,role});
         
         return res.status(200).json({
             success:true,
@@ -45,14 +45,14 @@ export const login = async(req,res)=>{
             })
         }
 
-        let user = User.findOne({email:email});
+        let user = await User.findOne({email:email});
         if(!user){
             return res.status(400).json({
                 success:false,
                 message:"User doesnot exist"
             })
         }
-        const isPassword = bcrypt.compare(password,user.password);
+        const isPassword = await bcrypt.compare(password,user.password);
         if(!isPassword){
             return res.status(401).json({
                 success:false,
@@ -68,7 +68,7 @@ export const login = async(req,res)=>{
         const tokenData  = {
             userId:user._id
         }
-        const token = jwt.sign(tokenData,process.env.SECRET_KEY,{expiresIn:'1d'});
+        const token = jwt.sign(tokenData,process.env.JWT_SECRET,{expiresIn:'1d'});
 
         user={
             _id:user._id,

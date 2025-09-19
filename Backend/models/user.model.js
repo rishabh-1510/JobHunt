@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     },
     profile:{
         bio:{type:String },
-        skills:{type:String},
+        skills:[{type:String}],
         resume:{type:String}, //URL
         resumeOriginalName:{type:String},
         compony:{type:mongoose.Schema.ObjectId , ref:'Compony'},
@@ -33,7 +33,5 @@ const userSchema = new mongoose.Schema({
     }
 
 },{timestamps:true})
-
-export const User = mongoose.model('User',userSchema);
-
-// 40
+const User = mongoose.model('User',userSchema);
+export default User;

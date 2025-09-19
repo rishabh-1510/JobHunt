@@ -1,10 +1,13 @@
 import express from "express"
-import resgister from "../controller/User.controller"
-import  login  from "../controller/User.controller";
-import updateProfile from "../controller/Profile.controller"
-const router = express.Router();
+import {logout, register} from "../controller/User.controller.js"
+import  {login}  from "../controller/User.controller.js";
+import {updateProfile} from "../controller/Profile.controller.js"
+import auth from "../middleware/auth.js";
 
-router.post("/register",resgister);
-router.post("/login",login);
-router.post("/profile/update", updateProfile)
 
+const Router = express.Router();
+Router.post("/register",register);
+Router.post("/login",login);
+Router.post("/profile/update", auth,updateProfile)
+Router.get("/logout",logout);
+export default Router;

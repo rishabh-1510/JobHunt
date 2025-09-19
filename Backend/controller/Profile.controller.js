@@ -1,11 +1,11 @@
-import { User } from "../models/user.model";
+import User from '../models/user.model.js';
 
 export const updateProfile=async(req,res)=>{
     try{
-        const{fullName , email , phoneNumber ,bio="" ,skills ="" } = req.body;
+        const{fullName , email , mobileNumber ,bio="" ,skills ="" } = req.body;
         const file  = req.file;
         const userId = req.id
-        if(!fullName , !email , !phoneNumber , !bio , !skills){
+        if(!fullName , !email , !mobileNumber , !bio , !skills){
             return res.status(401).json({
                 message:"Fill all the field properly",
                 success:false
@@ -13,7 +13,7 @@ export const updateProfile=async(req,res)=>{
         };
 
         //cloudinary
-
+        
         const skillsArray = skills.split(",");
         let user = await User.findById(userId);
         if(!user){
@@ -25,17 +25,17 @@ export const updateProfile=async(req,res)=>{
 
         user.fullName = fullName;
         user.email = email;
-        user.phoneNumber = phoneNumber;
+        user.mobileNumber = mobileNumber;
         user.profile.bio = bio;
         user.profile.skills =skillsArray
 
-        await User.save();
+        await user.save();
 
         user={
             _id:user._id,
             fullName:user.fullName,
             email:user.email,
-            phoneNumber:user.phoneNumber,
+            mobileNumber:user.mobileNumber,
             role:user.role,
             profile:user.profile
         }
