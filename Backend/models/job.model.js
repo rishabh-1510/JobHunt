@@ -29,9 +29,9 @@ const jobSchema =new mongoose.Schema({
         type:String,
         reqiured:true,
     },
-    compony:{
+    company:{
         type:mongoose.Schema.ObjectId,
-        ref:"Compony",
+        ref:"company",
         reqiured:true,
     },
     created_by:{

@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 
-const componySchema =new mongoose.Schema({
+const companySchema =new mongoose.Schema({
     name:{
         type:String,
         required:true,
     },
     description:{
         type:String,
-        required:true,
+
     },
     website:{
         type:String,
@@ -23,9 +23,7 @@ const componySchema =new mongoose.Schema({
         ref:"User",
         required:true
     },
-
-
     
 },{timestamps:true})
 
-export const Job = mongoose.model("Compony",componySchema)
+export const Company = mongoose.model("Company",companySchema)
