@@ -25,7 +25,7 @@ export const registercompany = async(req,res)=>{
             success:true,
             message:"company registered successfully",
             company
-        })
+        })  
     }catch(err){
         console.log(err)
     }
@@ -82,7 +82,7 @@ export const updatecompany = async(req,res)=>{
         
         //cloudinary
         const updateData = {name , description , website ,location};
-        const company = await Company.findByIdAndUpdate({_id:req.params.id},{updateData},{new:true});
+        const company = await Company.findByIdAndUpdate(req.params.id,{$set:updateData},{new:true});
         if(!company){
             return res.status(400).json({
                 success:false,
