@@ -6,6 +6,7 @@ import connectDB from "./utils/db.js"
 import userRoutes from "./routes/user.routes.js"
 import companyRoutes from "./routes/company.routes.js";
 import jobRoutes from "./routes/jobs.routes.js";
+import applicationRoutes from "./routes/application.routes.js"
 dotenv.config()
 const app = express()
 
@@ -20,7 +21,7 @@ const Option = {
     credential:true
 }
 
-
+app.use("/api/v1/application",applicationRoutes);
 app.use("/api/v1/user",userRoutes);
 app.use("/api/v1/company",companyRoutes);
 app.use("/api/v1/job",jobRoutes);
