@@ -2,6 +2,7 @@ import express from "express"
 import cookieParser from "cookie-parser";
 import cors from "cors"
 import dotenv from "dotenv"
+import dns from "dns";
 import connectDB from "./utils/db.js"
 import userRoutes from "./routes/user.routes.js"
 import companyRoutes from "./routes/company.routes.js";
@@ -15,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT; 
 const Option = {
     origin:`http//localhost:${PORT}`,
     credential:true
@@ -26,7 +27,7 @@ app.use("/api/v1/user",userRoutes);
 app.use("/api/v1/company",companyRoutes);
 app.use("/api/v1/job",jobRoutes);
 
-
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 app.use(cors(Option));
 app.listen(PORT,()=>{
     connectDB();

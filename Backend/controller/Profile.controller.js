@@ -4,13 +4,7 @@ export const updateProfile=async(req,res)=>{
     try{
         const{fullName , email , mobileNumber ,bio="" ,skills ="" } = req.body;
         const file  = req.file;
-        const userId = req.id
-        if(!fullName , !email , !mobileNumber , !bio , !skills){
-            return res.status(401).json({
-                message:"Fill all the field properly",
-                success:false
-            });
-        };
+        const userId = req.id;
 
         //cloudinary
         
@@ -23,11 +17,17 @@ export const updateProfile=async(req,res)=>{
             })
         };
 
-        user.fullName = fullName;
-        user.email = email;
-        user.mobileNumber = mobileNumber;
-        user.profile.bio = bio;
-        user.profile.skills =skillsArray
+        if(fullName){
+            user.fullName = fullName;
+        }
+        if(email)
+            user.email = email; 
+        if(mobileNumber)
+            user.mobileNumber = mobileNumber;
+        if(bio)
+            user.profile.bio = bio;
+        if(skills)
+            user.profile.skills =skillsArray
 
         await user.save();
 
