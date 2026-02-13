@@ -47,7 +47,7 @@ export const getAllJobs = async(req,res)=>{
                 {description:{$regex:keyword , $options:"i"}}
             ]
         };
-        const jobs = await Job.find(query).populate("company");
+        const jobs = await Job.find(query).populate("company").sort({createdAt:-1});
         if(!jobs){
             return res.status(400).json({
             success:false,
