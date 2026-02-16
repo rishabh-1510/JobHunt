@@ -12,16 +12,16 @@ export const register =async(req,res)=>{
                 message:"Fill all the credential properly"
             })
         };
-        const user = User.findOne(email);
-        if(!user){
-            return res.status(401).json({
+        const user =await User.findOne({email});
+        if(user){   
+            return res.status(400).json({
                 success:false,
                 message:"User Already exists please login"
             })
         }
         const hashedPassword =await bcrypt.hash(password,10);
         
-        const response = User.create({fullName,email,mobileNumber,password:hashedPassword,role});
+        const newUser =await User.create({fullName,email,mobileNumber,password:hashedPassword,role});
         
         return res.status(200).json({
             success:true,
@@ -29,7 +29,7 @@ export const register =async(req,res)=>{
         })
 
     }catch(err){
-        return res.status(404).json({
+        return res.status(400).json({
             success:false,
             message:err.message
     })
