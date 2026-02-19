@@ -4,8 +4,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Button } from "../ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LogOut, User2 } from "lucide-react"
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import store from '../../redux/store'
 const Navbar = () => {
-    const user = false;
+    const navigate = useNavigate();
+    
+    const{user}= useSelector(store=>store.auth);
     return (
         <div className='bg-white'>
             <div className='flex items-center justify-between max-w-7xl mx-auto h-16'>
@@ -14,9 +19,9 @@ const Navbar = () => {
                 </div>
                 <div className='flex items-center gap-12 '>
                     <ul className='flex font-medium items-center gap-5'>
-                        <li>Home</li>
-                        <li>Jobs</li>
-                        <li>Browse</li>
+                        <li className="cursor-pointer" onClick={()=>navigate("/")}>Home</li>
+                        <li className="cursor-pointer" onClick={()=>navigate("/jobs")}>Jobs</li>
+                        <li className="cursor-pointer" onClick={()=>navigate("/browse")}>Browse</li>
                     </ul>
                     {
                         user ? (
@@ -43,7 +48,7 @@ const Navbar = () => {
                                     <div className='flex flex-col my-2 items-start text-gray-600'>
                                         <div className='flex w-fit items-center gap-1 cursor-pointer'>
                                             <User2 />
-                                            <Button variant='link' className="cursor-pointer">View Profile</Button>
+                                            <Button variant='link' className="cursor-pointer" onClick={()=>navigate("/profile")}>View Profile</Button>
                                         </div>
                                         <div className='flex w-fit items-center gap-1 cursor-pointer'>
                                             <LogOut />
