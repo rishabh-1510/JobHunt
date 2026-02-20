@@ -1,47 +1,94 @@
-//6:55  
-
 import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import axios from "axios"
+import {USER_API_ENDPOINT} from '../../utils/api'
+import { setUser } from '../../redux/authSlice'
+import { toast } from 'sonner'
+
 const UpdateProfileDialog = ({ open, setOpen }) => {
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const {user} = useSelector(store=>store.auth)
   const[input , setInput]=useState({
-    fullname:user?.fullname,
-    email:user?.email,
-    phoneNumber:user?.phoneNumber,
-    bio:user?.profile?.bio,
-    skills:user?.profile?.skills?.map(skill=>skill),
-    file:user?.profile?.resume
+    fullname:user?.fullname || "",
+    email:user?.email || "",
+    phoneNumber:user?.phoneNumber || "",
+    bio:user?.profile?.bio || "",
+    skills: user?.profile?.skills?.join(", ") || "",
+    file:user?.profile?.resume || ""
   })
+  const changeEventHandler  = (e)=>{
+    setInput({...input,[e.target.name]:e.target.value})
+  }
+  const SubmitHandler=async(e)=>{
+    e.preventDefault();
+    const formData =new FormData();
+    formData.append("fullName",input.fullname);
+    formData.append("email",input.email);
+    formData.append("phoneNumber",input.phoneNumber);
+    formData.append("bio",input.bio);
+    formData.append("skills",input.skills);
+    if(input.file){
+      formData.append('file',input.file)
+    }
+
+    try{
+      const res = await axios.post(`${USER_API_ENDPOINT}/profile/update`,formData,{
+        headers:{
+          'Content-Type':'multipart/form-data'
+        },
+        withCredentials:true
+      });
+      if(res.data.success){
+        dispatch(setUser(res.data.user));
+        toast.success(res.data.message);
+      }
+    }catch(err){
+      console.log(err);
+      toast.error(err.response.data.message)
+    }
+    setOpen(false); 
+
+
+  }
+  const fileChangeHandler = (e)=>{
+    const file = e.target.files?.[0];
+    setInput({...input,file})
+  } 
   return (
     <Dialog open={open}>
-      <DialogContent className={'sm:[max-w-425px] '} onInteractOutside={() => setOpen(false)}>
+      <DialogContent className={'sm:max-w-[425px] '} onInteractOutside={() => setOpen(false)}>
         <DialogHeader>
           <DialogTitle>
             Update Profile
           </DialogTitle>
-          <form>
+        </DialogHeader>
+          <form onSubmit={SubmitHandler}>
             <div className='grid gap-4 py-4'>
               <div className='grid grid-cols-4 items-center gap-4'>
 
-                <Label htmlfor="name" className={'text-right'}>Name</Label>
+                <Label htmlFor="name" className={'text-right'}>Name</Label>
                 <Input
                   id='name'
-                  name='name'
+                  name='fullname'
                   className={'col-span-3'}
+                  value={input.fullname}
+                  onChange={changeEventHandler}
                 />
 
               </div>
               <div className='grid grid-cols-4 items-center gap-4'>
 
-                <Label htmlfor="email" className={'text-right'}>Email</Label>
+                <Label htmlFor="email" className={'text-right'}>Email</Label>
                 <Input
                   type={'email'}
                   id='email'
+                  value={input.email}
+                  onChange={changeEventHandler}
                   name='email'
                   className={'col-span-3'}
                 />
@@ -49,30 +96,36 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
               </div>
               <div className='grid grid-cols-4 items-center gap-4'>
 
-                <Label htmlfor="number" className={'text-right'}>Number</Label>
+                <Label htmlFor="number" className={'text-right'}>Number</Label>
                 <Input
                   id='number'
-                  name='number'
+                  name='phoneNumber'
+                  onChange={changeEventHandler}
                   className={'col-span-3'}
+                  value={input.phoneNumber}
                 />
 
               </div>
               <div className='grid grid-cols-4 items-center gap-4'>
 
-                <Label htmlfor="bio" className={'text-right'}>Bio</Label>
+                <Label htmlFor="bio" className={'text-right'}>Bio</Label>
                 <Input
                   id='bio'
                   name='bio'
+                  onChange={changeEventHandler}
                   className={'col-span-3'}
+                  value={input.bio}
                 />
 
               </div>
               <div className='grid grid-cols-4 items-center gap-4'>
 
-                <Label htmlfor="skills" className={'text-right'}>Skills</Label>
+                <Label htmlFor="skills" className={'text-right'}>Skills</Label>
                 <Input
                   id='skills'
                   name='skills'
+                  onChange={changeEventHandler}
+                  value={input.skills}
                   className={'col-span-3'}
                 />
 
@@ -80,12 +133,13 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
 
               <div className='grid grid-cols-4 items-center gap-4'>
 
-                <Label htmlfor="resume" className={'text-right'}>Resume</Label>
+                <Label htmlFor="resume" className={'text-right'}>Resume</Label>
                 <Input
-                  type={'file'}
+                  type='file'
                   accept="application/pdf"
                   id='resume'
-                  name='resume'
+                  onChange={fileChangeHandler}
+                  name='resume' 
                   className={'col-span-3'}
                 />
 
@@ -100,7 +154,6 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
               }
             </DialogFooter>
           </form>
-        </DialogHeader>
       </DialogContent>
     </Dialog>
   )
